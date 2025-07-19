@@ -202,8 +202,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 finalUrl += '?fbclid=' + fbclid;
             }
             
-            // Evento de rastreamento
-            fbq('track', 'Lead');
+            // Eventos de rastreamento
+fbq('track', 'ViewContent', {
+    content_type: 'product',
+    content_name: 'Mitolyn Weight Loss',
+    content_category: 'Health & Wellness'
+});
+fbq('track', 'Lead');
             
             // Redirecionar
             setTimeout(() => window.location.href = finalUrl, 100);
