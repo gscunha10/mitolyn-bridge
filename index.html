@@ -9,18 +9,30 @@
     <meta property="og:type" content="website"><meta name="twitter:title" content="">
     <meta name="twitter:description" content="">
     <meta name="twitter:card" content="summary"><meta name="twitter:image" content=""><meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-            <script>
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '1002938195345180');
-            fbq('track', 'PageView');
-            </script>
+          <script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+
+// NOVO: Capturar e preservar fbclid
+const urlParams = new URLSearchParams(window.location.search);
+const fbclid = urlParams.get('fbclid');
+
+let pixelConfig = {};
+if (fbclid) {
+    const timestamp = Math.floor(Date.now() / 1000);
+    pixelConfig.fbc = `fb.1.${timestamp}.${fbclid}`;
+    localStorage.setItem('fbclid', fbclid);
+}
+
+fbq('init', '1002938195345180', pixelConfig);
+fbq('track', 'PageView');
+</script>
             <noscript><img height="1" width="1" style="display:none"
             src="https://www.facebook.com/tr?id=1002938195345180&ev=PageView&noscript=1"
             /></noscript>
@@ -144,7 +156,32 @@
 
     <script type="text/javascript" src="js/jquery.min.js"></script>
 
+    <script>
+// Corrigir redirecionamentos para preservar fbclid
+document.addEventListener('DOMContentLoaded', function() {
+    const allCTAs = document.querySelectorAll('a[href*="clickbank"], .cta');
     
+    allCTAs.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const baseUrl = 'https://93a86iokycokp35bvfy90hclf0.hop.clickbank.net';
+            const fbclid = new URLSearchParams(window.location.search).get('fbclid') || localStorage.getItem('fbclid');
+            
+            let finalUrl = baseUrl;
+            if (fbclid) {
+                finalUrl += '?fbclid=' + fbclid;
+            }
+            
+            // Evento de rastreamento
+            fbq('track', 'Lead');
+            
+            // Redirecionar
+            setTimeout(() => window.location.href = finalUrl, 100);
+        });
+    });
+});
+</script>
 
     
     
