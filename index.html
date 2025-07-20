@@ -196,6 +196,84 @@
             box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
         }
         
+        .loading-section {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            display: none;
+            text-align: center;
+        }
+
+        .loading-section.active {
+            display: block;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        .loading-container {
+            padding: 60px 40px;
+        }
+
+        .loading-title {
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .analysis-steps {
+            margin: 40px 0;
+        }
+
+        .analysis-step {
+            padding: 15px 20px;
+            margin: 15px 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            opacity: 0.3;
+            transition: all 0.8s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .analysis-step.active {
+            opacity: 1;
+            background: rgba(255,255,255,0.2);
+            border-left-color: #00f2fe;
+            transform: translateX(10px);
+        }
+
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .percentage {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #00f2fe;
+        }
+        
         .results-section {
             background: linear-gradient(135deg, #56ab2f, #a8e6cf);
             color: white;
@@ -447,6 +525,43 @@
             <button class="answer-btn" onclick="showResults('whatever-takes')">Whatever it takes for guaranteed results</button>
         </div>
 
+        <!-- Loading/Analysis Section -->
+        <div class="quiz-card loading-section" id="loading">
+            <div class="loading-container">
+                <h2 class="loading-title" id="loading-title">🔬 Analyzing Your Responses...</h2>
+                
+                <div class="percentage" id="percentage">0%</div>
+                
+                <div class="progress-dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                
+                <div class="analysis-steps">
+                    <div class="analysis-step" id="step1">
+                        ✓ Processing your age and metabolic baseline...
+                    </div>
+                    <div class="analysis-step" id="step2">
+                        ✓ Analyzing your weight loss history patterns...
+                    </div>
+                    <div class="analysis-step" id="step3">
+                        ✓ Evaluating your energy level indicators...
+                    </div>
+                    <div class="analysis-step" id="step4">
+                        ✓ Calculating your personalized approach...
+                    </div>
+                    <div class="analysis-step" id="step5">
+                        ✓ Matching you with optimal solution...
+                    </div>
+                </div>
+                
+                <p style="opacity: 0.8; margin-top: 30px;">
+                    Please wait while we create your personalized recommendation...
+                </p>
+            </div>
+        </div>
+
         <!-- Results Section -->
         <div class="quiz-card results-section" id="results">
             <h2 id="results-title">🎯 Assessment Complete!</h2>
@@ -481,20 +596,22 @@
             <div class="feedback-container">
                 <img src="Tela de feedback.png" alt="Customer Feedback Results" class="feedback-image">
             </div>
-<!-- Vídeo Demonstrativo -->
-<div style="margin: 40px 0; text-align: center;">
-    <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 1.5em;">🎥 Watch: How Mitolyn Works</h3>
-    <video 
-        controls 
-        style="width: 100%; max-width: 600px; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.1);"
-        poster="1-mobile.png">
-        <source src="Mitolyn.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-    <p style="margin-top: 15px; color: #6c757d; font-size: 0.9em;">
-        See real results and understand the science behind Mitolyn
-    </p>
-</div>
+
+            <!-- Vídeo Demonstrativo -->
+            <div style="margin: 40px 0; text-align: center;">
+                <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 1.5em;">🎥 Watch: How Mitolyn Works</h3>
+                <video 
+                    controls 
+                    style="width: 100%; max-width: 600px; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.1);"
+                    poster="1-mobile.png">
+                    <source src="Mitolyn.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p style="margin-top: 15px; color: #6c757d; font-size: 0.9em;">
+                    See real results and understand the science behind Mitolyn
+                </p>
+            </div>
+
             <p style="font-size: 1.1em; margin: 30px 0; line-height: 1.7; color: #495057;">
                 <strong>🔬 The Science:</strong> Mitolyn works by optimizing your mitochondria (cellular powerhouses) with ingredients like 
                 Maqui Berry, Rhodiola, and Astaxanthin. When your mitochondria function efficiently, your body naturally burns more calories 
@@ -595,8 +712,12 @@
             // Hide question 6
             document.getElementById('q6').classList.remove('active');
             
-            // Show results
-            document.getElementById('results').classList.add('active');
+            // Show loading screen
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('loading-title').textContent = `🔬 Analyzing Your Responses, ${userName}...`;
+            
+            // Start analysis animation
+            startAnalysisAnimation();
             
             // Track quiz completion
             fbq('track', 'CompleteRegistration', {
@@ -606,50 +727,80 @@
             });
         }
 
-        function showSocialProof() {
-            document.getElementById('results').style.display = 'none';
-            document.getElementById('social-proof').classList.add('active');
+        function startAnalysisAnimation() {
+            const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
+            const percentageEl = document.getElementById('percentage');
+            let currentStep = 0;
+            let percentage = 0;
             
-            // Track recommendation view
-            fbq('track', 'ViewContent', {
-                content_name: 'Mitolyn Recommendation Viewed',
-                content_type: 'product'
-            });
-        }
+            const analysisInterval = setInterval(() => {
+                // Update percentage
+                percentage += Math.random() * 20 + 10;
+                if (percentage > 100) percentage = 100;
+                percentageEl.textContent = Math.floor(percentage) + '%';
+                
+                // Activate current step
+                if (currentStep < steps.length) {
+                    document.getElementById(steps[currentStep]).classList.add('active');
+                   currentStep++;
+               }
+               
+               // When complete, show results
+               if (percentage >= 100 && currentStep >= steps.length) {
+                   clearInterval(analysisInterval);
+                   
+                   setTimeout(() => {
+                       document.getElementById('loading').style.display = 'none';
+                       document.getElementById('results').classList.add('active');
+                   }, 1000);
+               }
+           }, 800);
+       }
 
-        function redirectToOffer() {
-            // Track purchase intent
-            fbq('track', 'InitiateCheckout', {
-                content_name: 'Mitolyn Purchase Intent',
-                content_type: 'product',
-                value: 294.00,
-                currency: 'USD'
-            });
-            
-            // Small delay to ensure tracking fires
-            setTimeout(() => {
-                window.open('https://93a86iokycokp35bvfy90hclf0.hop.clickbank.net', '_blank');
-            }, 500);
-        }
+       function showSocialProof() {
+           document.getElementById('results').style.display = 'none';
+           document.getElementById('social-proof').classList.add('active');
+           
+           // Track recommendation view
+           fbq('track', 'ViewContent', {
+               content_name: 'Mitolyn Recommendation Viewed',
+               content_type: 'product'
+           });
+       }
 
-        // Track page engagement
-        window.addEventListener('load', () => {
-            fbq('track', 'PageView');
-        });
+       function redirectToOffer() {
+           // Track purchase intent
+           fbq('track', 'InitiateCheckout', {
+               content_name: 'Mitolyn Purchase Intent',
+               content_type: 'product',
+               value: 294.00,
+               currency: 'USD'
+           });
+           
+           // Small delay to ensure tracking fires
+           setTimeout(() => {
+               window.open('https://93a86iokycokp35bvfy90hclf0.hop.clickbank.net', '_blank');
+           }, 500);
+       }
 
-        // Track scroll depth for engagement
-        let maxScroll = 0;
-        window.addEventListener('scroll', () => {
-            const scrollPercent = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
-            if (scrollPercent > maxScroll) {
-                maxScroll = scrollPercent;
-                if (maxScroll >= 50 && maxScroll < 75) {
-                    fbq('track', 'CustomEvent', {custom_parameter: '50_percent_scroll'});
-                } else if (maxScroll >= 75) {
-                    fbq('track', 'CustomEvent', {custom_parameter: '75_percent_scroll'});
-                }
-            }
-        });
-    </script>
+       // Track page engagement
+       window.addEventListener('load', () => {
+           fbq('track', 'PageView');
+       });
+
+       // Track scroll depth for engagement
+       let maxScroll = 0;
+       window.addEventListener('scroll', () => {
+           const scrollPercent = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+           if (scrollPercent > maxScroll) {
+               maxScroll = scrollPercent;
+               if (maxScroll >= 50 && maxScroll < 75) {
+                   fbq('track', 'CustomEvent', {custom_parameter: '50_percent_scroll'});
+               } else if (maxScroll >= 75) {
+                   fbq('track', 'CustomEvent', {custom_parameter: '75_percent_scroll'});
+               }
+           }
+       });
+   </script>
 </body>
 </html>
