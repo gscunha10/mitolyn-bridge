@@ -623,7 +623,8 @@
             </div>
 
             <button class="final-cta" onclick="redirectToOffer()">
-                Get Mitolyn - My #1 Recommendation
+                BUY NOW FOR UNDER $80
+
             </button>
             
             <p style="margin-top: 15px; color: #6c757d; font-size: 0.9em;">
@@ -632,175 +633,204 @@
         </div>
     </div>
 
-    <script>
-        let currentQuestion = 0;
-        let answers = {};
-        let userName = '';
+  <script>
+    let currentQuestion = 0;
+    let answers = {};
+    let userName = '';
+    
+    // Controle de eventos para evitar duplicação
+    let eventsTriggered = {
+        quizStarted: false,
+        nameCollected: false,
+        questionsCompleted: [],
+        assessmentCompleted: false,
+        recommendationViewed: false,
+        purchaseIntentTracked: false,
+        scroll50: false,
+        scroll75: false
+    };
 
-        function startQuiz() {
-            document.getElementById('intro').style.display = 'none';
-            document.getElementById('q0').classList.add('active');
-            
-            // Track quiz start
+    function startQuiz() {
+        document.getElementById('intro').style.display = 'none';
+        document.getElementById('q0').classList.add('active');
+        
+        // Track quiz start apenas uma vez
+        if (!eventsTriggered.quizStarted) {
             fbq('track', 'Lead');
+            eventsTriggered.quizStarted = true;
         }
+    }
 
-        function saveName() {
-            const nameInput = document.getElementById('userName');
-            userName = nameInput.value.trim();
-            
-            if (userName === '') {
-                alert('Please enter your name to continue');
-                return;
-            }
-            
-            // Hide name question
-            document.getElementById('q0').classList.remove('active');
-            
-            // Update all questions with personalized titles
-            updatePersonalizedTitles();
-            
-            // Show first real question
-            document.getElementById('q1').classList.add('active');
-            currentQuestion = 1;
-            
-            // Track name collection
+    function saveName() {
+        const nameInput = document.getElementById('userName');
+        userName = nameInput.value.trim();
+        
+        if (userName === '') {
+            alert('Please enter your name to continue');
+            return;
+        }
+        
+        // Hide name question
+        document.getElementById('q0').classList.remove('active');
+        
+        // Update all questions with personalized titles
+        updatePersonalizedTitles();
+        
+        // Show first real question
+        document.getElementById('q1').classList.add('active');
+        currentQuestion = 1;
+        
+        // Track name collection apenas uma vez
+        if (!eventsTriggered.nameCollected) {
             fbq('track', 'CompleteRegistration', {
                 content_name: 'Name Collected'
             });
+            eventsTriggered.nameCollected = true;
         }
+    }
 
-        function updatePersonalizedTitles() {
-            document.getElementById('q1-title').textContent = `${userName}, what's your current age range?`;
-            document.getElementById('q2-title').textContent = `${userName}, have you tried losing weight before?`;
-            document.getElementById('q3-title').textContent = `${userName}, which methods have you tried before that didn't work long-term?`;
-            document.getElementById('q4-title').textContent = `${userName}, how would you describe your energy levels?`;
-            document.getElementById('q5-title').textContent = `${userName}, what's your primary weight goal?`;
-            document.getElementById('q6-title').textContent = `${userName}, what's your investment comfort level for a proven solution?`;
-            document.getElementById('results-title').textContent = `🎯 Perfect, ${userName}! Assessment Complete!`;
-            document.getElementById('results-text').innerHTML = `${userName}, based on your responses, I believe you're an excellent candidate for a <strong>mitochondrial metabolism approach</strong>. Your profile suggests you'd benefit significantly from targeting the root cause of slow metabolism at the cellular level.`;
-            document.getElementById('recommendation-title').textContent = `🌟 ${userName}, My Recommendation: Mitolyn`;
-            document.getElementById('benefits-title').textContent = `Why Mitolyn is Perfect for You, ${userName}:`;
+    function updatePersonalizedTitles() {
+        document.getElementById('q1-title').textContent = `${userName}, what's your current age range?`;
+        document.getElementById('q2-title').textContent = `${userName}, have you tried losing weight before?`;
+        document.getElementById('q3-title').textContent = `${userName}, which methods have you tried before that didn't work long-term?`;
+        document.getElementById('q4-title').textContent = `${userName}, how would you describe your energy levels?`;
+        document.getElementById('q5-title').textContent = `${userName}, what's your primary weight goal?`;
+        document.getElementById('q6-title').textContent = `${userName}, what's your investment comfort level for a proven solution?`;
+        document.getElementById('results-title').textContent = `🎯 Perfect, ${userName}! Assessment Complete!`;
+        document.getElementById('results-text').innerHTML = `${userName}, based on your responses, I believe you're an excellent candidate for a <strong>mitochondrial metabolism approach</strong>. Your profile suggests you'd benefit significantly from targeting the root cause of slow metabolism at the cellular level.`;
+        document.getElementById('recommendation-title').textContent = `🌟 ${userName}, My Recommendation: Mitolyn`;
+        document.getElementById('benefits-title').textContent = `Why Mitolyn is Perfect for You, ${userName}:`;
+    }
+
+    function nextQuestion(questionNum, answer) {
+        // Store answer
+        answers[`q${currentQuestion}`] = answer;
+        
+        // Hide current question
+        document.getElementById(`q${currentQuestion}`).classList.remove('active');
+        
+        // Special logic for question 2 - skip question 3 if they never tried losing weight
+        if (currentQuestion === 2 && answer === 'ready-start') {
+            questionNum = 4; // Skip the "what methods" question
         }
-
-        function nextQuestion(questionNum, answer) {
-            // Store answer
-            answers[`q${currentQuestion}`] = answer;
-            
-            // Hide current question
-            document.getElementById(`q${currentQuestion}`).classList.remove('active');
-            
-            // Special logic for question 2 - skip question 3 if they never tried losing weight
-            if (currentQuestion === 2 && answer === 'ready-start') {
-                questionNum = 4; // Skip the "what methods" question
-            }
-            
-            // Show next question
-            document.getElementById(`q${questionNum}`).classList.add('active');
-            currentQuestion = questionNum;
-            
-            // Track question completion
+        
+        // Show next question
+        document.getElementById(`q${questionNum}`).classList.add('active');
+        
+        // Track question completion apenas uma vez por pergunta
+        if (!eventsTriggered.questionsCompleted.includes(currentQuestion)) {
             fbq('track', 'CompleteRegistration', {
                 content_name: `Question ${currentQuestion} Completed`
             });
+            eventsTriggered.questionsCompleted.push(currentQuestion);
         }
+        
+        currentQuestion = questionNum;
+    }
 
-        function showResults(answer) {
-            // Store final answer
-            answers.q6 = answer;
-            
-            // Hide question 6
-            document.getElementById('q6').classList.remove('active');
-            
-            // Show loading screen
-            document.getElementById('loading').classList.add('active');
-            document.getElementById('loading-title').textContent = `🔬 Analyzing Your Responses, ${userName}...`;
-            
-            // Start analysis animation
-            startAnalysisAnimation();
-            
-            // Track quiz completion
+    function showResults(answer) {
+        // Store final answer
+        answers.q6 = answer;
+        
+        // Hide question 6
+        document.getElementById('q6').classList.remove('active');
+        
+        // Show loading screen
+        document.getElementById('loading').classList.add('active');
+        document.getElementById('loading-title').textContent = `🔬 Analyzing Your Responses, ${userName}...`;
+        
+        // Start analysis animation
+        startAnalysisAnimation();
+        
+        // Track quiz completion apenas uma vez
+        if (!eventsTriggered.assessmentCompleted) {
             fbq('track', 'CompleteRegistration', {
                 content_name: 'Assessment Completed',
                 value: 1.00,
                 currency: 'USD'
             });
+            eventsTriggered.assessmentCompleted = true;
         }
+    }
 
-        function startAnalysisAnimation() {
-            const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
-            const percentageEl = document.getElementById('percentage');
-            let currentStep = 0;
-            let percentage = 0;
+    function startAnalysisAnimation() {
+        const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
+        const percentageEl = document.getElementById('percentage');
+        let currentStep = 0;
+        let percentage = 0;
+        
+        const analysisInterval = setInterval(() => {
+            // Update percentage
+            percentage += Math.random() * 20 + 10;
+            if (percentage > 100) percentage = 100;
+            percentageEl.textContent = Math.floor(percentage) + '%';
             
-            const analysisInterval = setInterval(() => {
-                // Update percentage
-                percentage += Math.random() * 20 + 10;
-                if (percentage > 100) percentage = 100;
-                percentageEl.textContent = Math.floor(percentage) + '%';
-                
-                // Activate current step
-                if (currentStep < steps.length) {
-                    document.getElementById(steps[currentStep]).classList.add('active');
-                   currentStep++;
-               }
-               
-               // When complete, show results
-               if (percentage >= 100 && currentStep >= steps.length) {
-                   clearInterval(analysisInterval);
-                   
-                   setTimeout(() => {
-                       document.getElementById('loading').style.display = 'none';
-                       document.getElementById('results').classList.add('active');
-                   }, 1000);
-               }
-           }, 800);
-       }
-
-       function showSocialProof() {
-           document.getElementById('results').style.display = 'none';
-           document.getElementById('social-proof').classList.add('active');
+            // Activate current step
+            if (currentStep < steps.length) {
+                document.getElementById(steps[currentStep]).classList.add('active');
+               currentStep++;
+           }
            
-           // Track recommendation view
+           // When complete, show results
+           if (percentage >= 100 && currentStep >= steps.length) {
+               clearInterval(analysisInterval);
+               
+               setTimeout(() => {
+                   document.getElementById('loading').style.display = 'none';
+                   document.getElementById('results').classList.add('active');
+               }, 1000);
+           }
+       }, 800);
+   }
+
+   function showSocialProof() {
+       document.getElementById('results').style.display = 'none';
+       document.getElementById('social-proof').classList.add('active');
+       
+       // Track recommendation view apenas uma vez
+       if (!eventsTriggered.recommendationViewed) {
            fbq('track', 'ViewContent', {
                content_name: 'Mitolyn Recommendation Viewed',
                content_type: 'product'
            });
+           eventsTriggered.recommendationViewed = true;
        }
+   }
 
-       function redirectToOffer() {
-           // Track purchase intent
+   function redirectToOffer() {
+       // Track purchase intent apenas uma vez
+       if (!eventsTriggered.purchaseIntentTracked) {
            fbq('track', 'InitiateCheckout', {
                content_name: 'Mitolyn Purchase Intent',
                content_type: 'product',
                value: 294.00,
                currency: 'USD'
            });
-           
-           // Small delay to ensure tracking fires
-           setTimeout(() => {
-               window.open('https://93a86iokycokp35bvfy90hclf0.hop.clickbank.net', '_blank');
-           }, 500);
+           eventsTriggered.purchaseIntentTracked = true;
        }
+       
+       // Small delay to ensure tracking fires
+       setTimeout(() => {
+           window.open('https://93a86iokycokp35bvfy90hclf0.hop.clickbank.net', '_blank');
+       }, 500);
+   }
 
-       // Track page engagement
-       window.addEventListener('load', () => {
-           fbq('track', 'PageView');
-       });
-
-       // Track scroll depth for engagement
-       let maxScroll = 0;
-       window.addEventListener('scroll', () => {
-           const scrollPercent = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
-           if (scrollPercent > maxScroll) {
-               maxScroll = scrollPercent;
-               if (maxScroll >= 50 && maxScroll < 75) {
-                   fbq('track', 'CustomEvent', {custom_parameter: '50_percent_scroll'});
-               } else if (maxScroll >= 75) {
-                   fbq('track', 'CustomEvent', {custom_parameter: '75_percent_scroll'});
-               }
+   // Track scroll depth for engagement apenas uma vez por marco
+   let maxScroll = 0;
+   window.addEventListener('scroll', () => {
+       const scrollPercent = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+       if (scrollPercent > maxScroll) {
+           maxScroll = scrollPercent;
+           if (maxScroll >= 50 && maxScroll < 75 && !eventsTriggered.scroll50) {
+               fbq('track', 'CustomEvent', {custom_parameter: '50_percent_scroll'});
+               eventsTriggered.scroll50 = true;
+           } else if (maxScroll >= 75 && !eventsTriggered.scroll75) {
+               fbq('track', 'CustomEvent', {custom_parameter: '75_percent_scroll'});
+               eventsTriggered.scroll75 = true;
            }
-       });
+       }
+   });
+
    </script>
 </body>
 </html>
