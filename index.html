@@ -633,7 +633,7 @@
         </div>
     </div>
 
-  <script>
+ <script>
     let currentQuestion = 0;
     let answers = {};
     let userName = '';
@@ -641,8 +641,6 @@
     // Controle de eventos para evitar duplicação
     let eventsTriggered = {
         quizStarted: false,
-        nameCollected: false,
-        questionsCompleted: [],
         assessmentCompleted: false,
         recommendationViewed: false,
         purchaseIntentTracked: false,
@@ -650,16 +648,16 @@
         scroll75: false
     };
 
-  function startQuiz() {
-    document.getElementById('intro').style.display = 'none';
-    document.getElementById('q0').classList.add('active');
-    
-    // Apenas track de início do quiz (sem Lead)
-    if (!eventsTriggered.quizStarted) {
-        fbq('track', 'CustomEvent', {custom_parameter: 'quiz_started'});
-        eventsTriggered.quizStarted = true;
+    function startQuiz() {
+        document.getElementById('intro').style.display = 'none';
+        document.getElementById('q0').classList.add('active');
+        
+        // Apenas track de início do quiz (sem Lead)
+        if (!eventsTriggered.quizStarted) {
+            fbq('track', 'CustomEvent', {custom_parameter: 'quiz_started'});
+            eventsTriggered.quizStarted = true;
+        }
     }
-}
 
     function saveName() {
         const nameInput = document.getElementById('userName');
@@ -679,8 +677,6 @@
         // Show first real question
         document.getElementById('q1').classList.add('active');
         currentQuestion = 1;
-        
-        
     }
 
     function updatePersonalizedTitles() {
@@ -710,8 +706,6 @@
         
         // Show next question
         document.getElementById(`q${questionNum}`).classList.add('active');
-        
-       
         
         currentQuestion = questionNum;
     }
@@ -771,20 +765,20 @@
        }, 800);
    }
 
-  function showSocialProof() {
-    document.getElementById('results').style.display = 'none';
-    document.getElementById('social-proof').classList.add('active');
-    
-    // ADICIONAR AQUI: Disparar Lead quando chegar na recomendação
-    if (!eventsTriggered.recommendationViewed) {
-        fbq('track', 'Lead'); // ← LEAD DISPARA AQUI AGORA
-        fbq('track', 'ViewContent', {
-            content_name: 'Mitolyn Recommendation Viewed',
-            content_type: 'product'
-        });
-        eventsTriggered.recommendationViewed = true;
+    function showSocialProof() {
+        document.getElementById('results').style.display = 'none';
+        document.getElementById('social-proof').classList.add('active');
+        
+        // LEAD DISPARA AQUI - quando vê a recomendação do Mitolyn
+        if (!eventsTriggered.recommendationViewed) {
+            fbq('track', 'Lead'); // ← LEAD DISPARA AQUI AGORA
+            fbq('track', 'ViewContent', {
+                content_name: 'Mitolyn Recommendation Viewed',
+                content_type: 'product'
+            });
+            eventsTriggered.recommendationViewed = true;
+        }
     }
-}
 
    function redirectToOffer() {
        // Track purchase intent apenas uma vez
@@ -819,7 +813,6 @@
            }
        }
    });
-
    </script>
 </body>
 </html>
