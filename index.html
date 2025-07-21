@@ -650,16 +650,16 @@
         scroll75: false
     };
 
-    function startQuiz() {
-        document.getElementById('intro').style.display = 'none';
-        document.getElementById('q0').classList.add('active');
-        
-        // Track quiz start apenas uma vez
-        if (!eventsTriggered.quizStarted) {
-            fbq('track', 'Lead');
-            eventsTriggered.quizStarted = true;
-        }
+  function startQuiz() {
+    document.getElementById('intro').style.display = 'none';
+    document.getElementById('q0').classList.add('active');
+    
+    // Apenas track de início do quiz (sem Lead)
+    if (!eventsTriggered.quizStarted) {
+        fbq('track', 'CustomEvent', {custom_parameter: 'quiz_started'});
+        eventsTriggered.quizStarted = true;
     }
+}
 
     function saveName() {
         const nameInput = document.getElementById('userName');
@@ -783,19 +783,20 @@
        }, 800);
    }
 
-   function showSocialProof() {
-       document.getElementById('results').style.display = 'none';
-       document.getElementById('social-proof').classList.add('active');
-       
-       // Track recommendation view apenas uma vez
-       if (!eventsTriggered.recommendationViewed) {
-           fbq('track', 'ViewContent', {
-               content_name: 'Mitolyn Recommendation Viewed',
-               content_type: 'product'
-           });
-           eventsTriggered.recommendationViewed = true;
-       }
-   }
+  function showSocialProof() {
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('social-proof').classList.add('active');
+    
+    // ADICIONAR AQUI: Disparar Lead quando chegar na recomendação
+    if (!eventsTriggered.recommendationViewed) {
+        fbq('track', 'Lead'); // ← LEAD DISPARA AQUI AGORA
+        fbq('track', 'ViewContent', {
+            content_name: 'Mitolyn Recommendation Viewed',
+            content_type: 'product'
+        });
+        eventsTriggered.recommendationViewed = true;
+    }
+}
 
    function redirectToOffer() {
        // Track purchase intent apenas uma vez
