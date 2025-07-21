@@ -680,13 +680,7 @@
         document.getElementById('q1').classList.add('active');
         currentQuestion = 1;
         
-        // Track name collection apenas uma vez
-        if (!eventsTriggered.nameCollected) {
-            fbq('track', 'CompleteRegistration', {
-                content_name: 'Name Collected'
-            });
-            eventsTriggered.nameCollected = true;
-        }
+        
     }
 
     function updatePersonalizedTitles() {
@@ -717,13 +711,7 @@
         // Show next question
         document.getElementById(`q${questionNum}`).classList.add('active');
         
-        // Track question completion apenas uma vez por pergunta
-        if (!eventsTriggered.questionsCompleted.includes(currentQuestion)) {
-            fbq('track', 'CompleteRegistration', {
-                content_name: `Question ${currentQuestion} Completed`
-            });
-            eventsTriggered.questionsCompleted.push(currentQuestion);
-        }
+       
         
         currentQuestion = questionNum;
     }
